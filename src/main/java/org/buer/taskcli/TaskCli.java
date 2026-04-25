@@ -34,7 +34,8 @@ public class TaskCli {
         
         try (Scanner scanner = new Scanner(System.in))
         {
-            while(true) 
+            label:
+            while(true)
         {
             System.out.println("""
                                Menu
@@ -48,53 +49,52 @@ public class TaskCli {
             {
                 String input;
                 input = scanner.nextLine();
-                if (input.isEmpty() || input.isBlank())
+                if (input.isBlank())
             {
                 System.out.println("Please choose between the menu above!!");
             }
-                if ("1".equals(input)) 
-                {
-                    System.out.println("Write new task: ");
-                    String taskName = scanner.nextLine();
-                    saveTask(taskName);
-                    TASKS.add(taskName);
-                } else if ("2".equals(input))
-                {
-                    System.out.println("\nTasks List: ");
-                    for (int i = 0; i < TASKS.size(); i++)
-                    {
-                        System.out.printf("[%d]. %s%n", i + 1, TASKS.get(i));
+                switch (input) {
+                    case "1":
+                        System.out.println("Write new task: ");
+                        String taskName = scanner.nextLine();
+                        saveTask(taskName);
+                        TASKS.add(taskName);
+                        break;
+                    case "2":
+                        System.out.println("\nTasks List: ");
+                        for (int i = 0; i < TASKS.size(); i++) {
+                            System.out.printf("[%d]. %s%n", i + 1, TASKS.get(i));
+                        }
+                        break;
+                    case "3": {
+                        System.out.println("Choose id number you wanna update: ");
+                        int index = Integer.parseInt(scanner.nextLine()) - 1;
+                        if (index >= 0 && index < TASKS.size()) {
+                            System.out.println("Input task's new name: ");
+                            String newName = scanner.nextLine();
+                            TASKS.set(index, newName);
+                            refreshCSV();
+                        } else {
+                            System.out.println("Id is not exist.");
+                        }
+                        break;
                     }
-                } else if ("3".equals(input))
-                {
-                    System.out.println("Choose id number you wanna update: ");
-                    int index = Integer.parseInt(scanner.nextLine()) - 1;
-                    if (index >= 0 && index < TASKS.size()) {
-                        System.out.println("Input task's new name: ");
-                        String newName = scanner.nextLine();
-                        TASKS.set(index, newName);
-                        refreshCSV();
-                    } else {
-                        System.out.println("Id is not exist.");
+                    case "4": {
+                        System.out.println("Choose id number you wanna delete: ");
+                        if (TASKS.isEmpty()) {
+                            System.err.println("Tasks is empty!!");
+                        }
+                        int index = Integer.parseInt(scanner.nextLine()) - 1;
+                        if (index >= 0 && index < TASKS.size()) {
+                            TASKS.remove(index);
+                            refreshCSV();
+                            System.out.println("Successfully delete data");
+                        }
+
+                        break;
                     }
-                } else if ("4".equals(input)) 
-                {
-                    System.out.println("Choose id number you wanna delete: ");
-                    if (TASKS.isEmpty())
-                    {
-                        System.err.println("Tasks is empty!!");
-                    }
-                    int index = Integer.parseInt(scanner.nextLine()) - 1;
-                    if (index >= 0 && index < TASKS.size()) 
-                    {
-                        TASKS.remove(index);
-                        refreshCSV();
-                        System.out.println("Successfully delete data");
-                    }
-                    
-                } else if ("5".equals(input))
-                {
-                    break;
+                    case "5":
+                        break label;
                 }
             } catch (NumberFormatException _)
             {
@@ -107,7 +107,7 @@ public class TaskCli {
                 System.out.println("Unknown Error");
             }
         }
-    } catch (Exception e)
+        } catch (Exception e)
     {
         System.out.println("Unknown Error");
     }
