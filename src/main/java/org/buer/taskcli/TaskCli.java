@@ -40,8 +40,9 @@ public class TaskCli {
                                Menu
                                [1]. Add tasks
                                [2]. Read Tasks
-                               [3]. Delete Tasks
-                               [4]. Exit
+                               [3]. Update Tasks
+                               [4]. Delete Tasks
+                               [5]. Exit
                                """.stripIndent());
             try
             {
@@ -64,7 +65,19 @@ public class TaskCli {
                     {
                         System.out.printf("[%d]. %s%n", i + 1, TASKS.get(i));
                     }
-                } else if ("3".equals(input)) 
+                } else if ("3".equals(input))
+                {
+                    System.out.println("Choose id number you wanna update: ");
+                    int index = Integer.parseInt(scanner.nextLine()) - 1;
+                    if (index >= 0 && index < TASKS.size()) {
+                        System.out.println("Input task's new name: ");
+                        String newName = scanner.nextLine();
+                        TASKS.set(index, newName);
+                        refreshCSV();
+                    } else {
+                        System.out.println("Id is not exist.");
+                    }
+                } else if ("4".equals(input)) 
                 {
                     System.out.println("Choose id number you wanna delete: ");
                     if (TASKS.isEmpty())
@@ -79,7 +92,7 @@ public class TaskCli {
                         System.out.println("Successfully delete data");
                     }
                     
-                } else if ("4".equals(input))
+                } else if ("5".equals(input))
                 {
                     break;
                 }
