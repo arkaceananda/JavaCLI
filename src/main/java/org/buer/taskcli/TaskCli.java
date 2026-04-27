@@ -23,7 +23,7 @@ public class TaskCli {
     public static final String FILE_NAME = "src/main/java/org/buer/taskcli/tasks.csv";
     public static final ArrayList<String> TASKS = new ArrayList<>();
 
-    public static void main(String[] args) {
+    void main() {
         initFile();
         loadData();
         menu();
@@ -57,6 +57,10 @@ public class TaskCli {
                     case "1":
                         System.out.println("Write new task: ");
                         String taskName = scanner.nextLine();
+                        if (taskName == null || taskName.isBlank()) {
+                            System.err.println("Value cannot be null!");
+                            break;
+                        }
                         saveTask(taskName);
                         TASKS.add(taskName);
                         break;
@@ -99,9 +103,9 @@ public class TaskCli {
             } catch (NumberFormatException _)
             {
                 System.err.println("[!] ERROR: Please input number instead of letter");
-            } catch (NullPointerException npe)
+            } catch (NullPointerException ex)
             {
-                System.err.println("[!] WARNING: " + npe.getMessage());
+                System.err.println("[!] WARNING: " + ex.getMessage());
             } catch (Exception _)
             {
                 System.out.println("Unknown Error");
@@ -118,7 +122,7 @@ public class TaskCli {
         try (FileWriter write = new FileWriter(FILE_NAME, true))
         {
             int id = TASKS.size() + 1;
-            write.append(id + ", " + taskName + "\n");
+            write.append(String.valueOf(id)).append(", ").append(taskName).append("\n");
             System.out.println("Successfully insert task to CSV");
         } catch (IOException e)
         {
