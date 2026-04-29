@@ -14,6 +14,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static org.buer.taskcli.Color.*;
+
 /**
  *
  * @author ADVAN
@@ -29,36 +31,31 @@ public class TaskCli {
         menu();
     }
     
-    private static void menu() 
-    {
+    private static void menu() {
         
-        try (Scanner scanner = new Scanner(System.in))
-        {
+        try (Scanner scanner = new Scanner(System.in)) {
             label:
-            while(true)
-        {
-            System.out.println("""
+            while(true) {
+            System.out.println(PURPLE + """
                                Menu
                                [1]. Add tasks
                                [2]. Read Tasks
                                [3]. Update Tasks
                                [4]. Delete Tasks
                                [5]. Exit
-                               """.stripIndent());
-            try
-            {
+                               """.stripIndent() + RESET);
+            try {
                 String input;
                 input = scanner.nextLine();
-                if (input.isBlank())
-            {
-                System.out.println("Please choose between the menu above!!");
+                if (input.isBlank()) {
+                System.out.println(RED + "Please choose between the menu above!!" + RESET);
             }
                 switch (input) {
                     case "1":
                         System.out.println("Write new task: ");
                         String taskName = scanner.nextLine();
                         if (taskName == null || taskName.isBlank()) {
-                            System.err.println("Value cannot be null!");
+                            System.err.println(RED + "Value cannot be null!" + RESET);
                             break;
                         }
                         saveTask(taskName);
@@ -79,20 +76,20 @@ public class TaskCli {
                             TASKS.set(index, newName);
                             refreshCSV();
                         } else {
-                            System.out.println("Id is not exist.");
+                            System.out.println(RED + "Id is not exist." + RESET);
                         }
                         break;
                     }
                     case "4": {
                         System.out.println("Choose id number you wanna delete: ");
                         if (TASKS.isEmpty()) {
-                            System.err.println("Tasks is empty!!");
+                            System.err.println(RED + "Tasks is empty!!" + RESET);
                         }
                         int index = Integer.parseInt(scanner.nextLine()) - 1;
                         if (index >= 0 && index < TASKS.size()) {
                             TASKS.remove(index);
                             refreshCSV();
-                            System.out.println("Successfully delete data");
+                            System.out.println(GREEN + "Successfully delete data" + RESET);
                         }
 
                         break;
@@ -100,59 +97,45 @@ public class TaskCli {
                     case "5":
                         break label;
                 }
-            } catch (NumberFormatException _)
-            {
-                System.err.println("[!] ERROR: Please input number instead of letter");
-            } catch (NullPointerException ex)
-            {
-                System.err.println("[!] WARNING: " + ex.getMessage());
-            } catch (Exception _)
-            {
-                System.out.println("Unknown Error");
+            } catch (NumberFormatException _) {
+                System.err.println(RED + "[!] ERROR: Please input number instead of letter" + RESET);
+            } catch (NullPointerException ex) {
+                System.err.println(RED + "[!] WARNING: " + ex.getMessage() + RESET);
+            } catch (Exception _) {
+                System.out.println(YELLOW + "Unknown Error" + RESET);
             }
         }
-        } catch (Exception e)
-    {
-        System.out.println("Unknown Error");
+        } catch (Exception _) {
+        System.out.println(YELLOW+ "Unknown Error" + RESET);
     }
 }
     
-    private static void saveTask(String taskName)
-    {
-        try (FileWriter write = new FileWriter(FILE_NAME, true))
-        {
+    private static void saveTask(String taskName) {
+        try (FileWriter write = new FileWriter(FILE_NAME, true)) {
             int id = TASKS.size() + 1;
             write.append(String.valueOf(id)).append(", ").append(taskName).append("\n");
-            System.out.println("Successfully insert task to CSV");
-        } catch (IOException e)
-        {
-            System.err.println("[!] ERROR: " + e.getMessage());
+            System.out.println(GREEN + "Successfully insert task to CSV" + RESET);
+        } catch (IOException ex) {
+            System.err.println(RED + "[!] ERROR: " + ex.getMessage() + RESET);
         }
     }
     
-    private static void initFile() 
-    {
+    private static void initFile() {
         File file = new File(FILE_NAME);
-        if(!file.exists())
-        {
-            try (PrintWriter writer = new PrintWriter(new FileWriter(file))) 
-            {
+        if (!file.exists()) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
                 writer.println("id,task");
                 System.out.println("Csv file successfully created!");
-            } catch (IOException | NullPointerException e) 
-            {
-                System.out.println("Error: " + e.getMessage());
-            } catch (Exception e) 
-            {
-                System.out.println("Failed to create new file");
+            } catch (IOException | NullPointerException ex) {
+                System.out.println(RED + "Error: " + ex.getMessage() + RESET);
+            } catch (Exception _) {
+                System.out.println(RED + "Failed to create new file" + RESET);
             }
         }
     }
     
-    private static void loadData()
-    {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME)))
-        {
+    private static void loadData() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             reader.readLine();
             
@@ -164,25 +147,21 @@ public class TaskCli {
                 }
             }
         } catch (FileNotFoundException ex) {
-            System.err.println("[!] ERROR: " + ex.getMessage());
+            System.err.println(RED + "[!] ERROR: " + ex.getMessage() + RESET);
         } catch (IOException ex) {
-            System.out.println("[!] Failed To Load Data: " + ex.getMessage());
+            System.out.println(RED + "[!] Failed To Load Data: " + ex.getMessage() + RESET);
         }
     }
     
-    private static void refreshCSV() 
-    {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME)))
-        {
+    private static void refreshCSV() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
             writer.println("id,task");
             
-            for (int i = 0; i < TASKS.size(); i++) 
-            {
+            for (int i = 0; i < TASKS.size(); i++) {
                 writer.println((i + 1) + "," + TASKS.get(i));
             }
-        } catch (IOException ex) 
-        {
-            System.err.println("[!] FAILED TO LOAD FILE: " + ex.getMessage());
+        } catch (IOException ex) {
+            System.err.println(RED + "[!] FAILED TO LOAD FILE: " + ex.getMessage() + RESET);
         }
     }
 }
