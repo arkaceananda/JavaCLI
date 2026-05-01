@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDateTime;
 
 import static org.buer.taskcli.Color.*;
 
@@ -59,7 +61,9 @@ public class TaskCli {
                             break;
                         }
                         saveTask(taskName);
-                        TASKS.add(taskName);
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        String now = LocalDateTime.now().format(formatter);
+                        TASKS.add(taskName + " (Created at: " + now + ")");
                         break;
                     case "2":
                         System.out.println("\nTasks List: ");
@@ -113,7 +117,14 @@ public class TaskCli {
     private static void saveTask(String taskName) {
         try (FileWriter write = new FileWriter(FILE_NAME, true)) {
             int id = TASKS.size() + 1;
-            write.append(String.valueOf(id)).append(", ").append(taskName).append("\n");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = LocalDateTime.now().format(formatter);
+            write.append(String.valueOf(id))
+                    .append(", ")
+                    .append(taskName)
+                    .append(",")
+                    .append(formattedDate)
+                    .append("\n");
             System.out.println(GREEN + "Successfully insert task to CSV" + RESET);
         } catch (IOException ex) {
             System.err.println(RED + "[!] ERROR: " + ex.getMessage() + RESET);
@@ -124,7 +135,7 @@ public class TaskCli {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-                writer.println("id,task");
+                writer.println("id,task,timestamp");
                 System.out.println("Csv file successfully created!");
             } catch (IOException | NullPointerException ex) {
                 System.out.println(RED + "Error: " + ex.getMessage() + RESET);
@@ -142,8 +153,8 @@ public class TaskCli {
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
                 
-                if (data.length > 1) {
-                    TASKS.add(data[1]);
+                if (data.length > 2) {
+                    TASKS.add(data[1] + "(Created at: " + data[2] + ")");
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -155,10 +166,13 @@ public class TaskCli {
     
     private static void refreshCSV() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
-            writer.println("id,task");
+            writer.println("id,task,timestamp");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String now = LocalDateTime.now().format(formatter);
             
             for (int i = 0; i < TASKS.size(); i++) {
-                writer.println((i + 1) + "," + TASKS.get(i));
+                writer.println((i + 1) + "," + TASKS.get(i) + "," + now);
             }
         } catch (IOException ex) {
             System.err.println(RED + "[!] FAILED TO LOAD FILE: " + ex.getMessage() + RESET);
